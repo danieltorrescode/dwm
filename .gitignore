@@ -1,0 +1,7 @@
+dwm
+st
+config.h
+*.o
+*.diff
+*.orig
+*.rej
