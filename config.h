@@ -5,8 +5,8 @@ static const unsigned int borderpx  = 1;        /* border pixel of windows */
 static const unsigned int snap      = 32;       /* snap pixel */
 static const int showbar            = 1;        /* 0 means no bar */
 static const int topbar             = 1;        /* 0 means bottom bar */
-static const char *fonts[]          = { "monospace:size=10" };
-static const char dmenufont[]       = "monospace:size=10";
+static const char *fonts[]          = { "Liberation Mono:pixelsize=12:antialias=true:autohint=true","monospace:size=10" };
+static const char dmenufont[]       = "Liberation Mono:pixelsize=12:antialias=true:autohint=true";
 static const char col_gray1[]       = "#222222";
 static const char col_gray2[]       = "#444444";
 static const char col_gray3[]       = "#bbbbbb";
@@ -45,7 +45,7 @@ static const Layout layouts[] = {
 };
 
 /* key definitions */
-#define MODKEY Mod1Mask
+#define MODKEY Mod4Mask
 #define TAGKEYS(KEY,TAG) \
 	{ MODKEY,                       KEY,      view,           {.ui = 1 << TAG} }, \
 	{ MODKEY|ControlMask,           KEY,      toggleview,     {.ui = 1 << TAG} }, \
@@ -60,11 +60,14 @@ static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() 
 static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", col_gray1, "-nf", col_gray3, "-sb", col_cyan, "-sf", col_gray4, NULL };
 static const char *termcmd[]  = { "st", NULL };
 
-#include "movestack.c"
+#include <X11/XF86keysym.h>
 static Key keys[] = {
 	/* modifier                     key        function        argument */
-	{ MODKEY,                       XK_p,      spawn,          {.v = dmenucmd } },
-	{ MODKEY|ShiftMask,             XK_Return, spawn,          {.v = termcmd } },
+	{ MODKEY|ShiftMask,             XK_d,      spawn,          {.v = dmenucmd } },
+	{ MODKEY,                       XK_Return, spawn,          {.v = termcmd } },
+	{ MODKEY|ShiftMask,             XK_f,      spawn,          SHCMD("firefox") },
+	{ MODKEY|ShiftMask,             XK_e,      spawn,          SHCMD("emacs") },
+	{ MODKEY|ShiftMask,             XK_v,      spawn,          SHCMD("st vifm") },
 	{ MODKEY,                       XK_b,      togglebar,      {0} },
 	{ MODKEY,                       XK_j,      focusstack,     {.i = +1 } },
 	{ MODKEY,                       XK_k,      focusstack,     {.i = -1 } },
@@ -72,12 +75,7 @@ static Key keys[] = {
 	{ MODKEY,                       XK_d,      incnmaster,     {.i = -1 } },
 	{ MODKEY,                       XK_h,      setmfact,       {.f = -0.05} },
 	{ MODKEY,                       XK_l,      setmfact,       {.f = +0.05} },
-	{ MODKEY|ShiftMask,             XK_h,      setcfact,       {.f = +0.25} },
-	{ MODKEY|ShiftMask,             XK_l,      setcfact,       {.f = -0.25} },
-	{ MODKEY|ShiftMask,             XK_o,      setcfact,       {.f =  0.00} },
-	{ MODKEY|ShiftMask,             XK_j,      movestack,      {.i = +1 } },
-	{ MODKEY|ShiftMask,             XK_k,      movestack,      {.i = -1 } },
-	{ MODKEY,                       XK_Return, zoom,           {0} },
+	{ MODKEY|ShiftMask,             XK_Return, zoom,           {0} },
 	{ MODKEY,                       XK_Tab,    view,           {0} },
 	{ MODKEY|ShiftMask,             XK_c,      killclient,     {0} },
 	{ MODKEY,                       XK_t,      setlayout,      {.v = &layouts[0]} },
@@ -101,6 +99,51 @@ static Key keys[] = {
 	TAGKEYS(                        XK_8,                      7)
 	TAGKEYS(                        XK_9,                      8)
 	{ MODKEY|ShiftMask,             XK_q,      quit,           {0} },
+    // ----------------- Hardware ------------------
+	{ 0, XK_Print,                             spawn,		SHCMD("flameshot gui") },
+	// { 0, XK_Print,                             spawn,		SHCMD("maim pic-full-$(date '+%y%m%d-%H%M-%S').png") },
+	// { ShiftMask, XK_Print,                     spawn,		SHCMD("maimpick") },
+	// { MODKEY, XK_Print,                        spawn,		SHCMD("dmenurecord") },
+	// { MODKEY|ShiftMask, XK_Print,              spawn,		SHCMD("dmenurecord kill") },
+	// { MODKEY, XK_Delete,                       spawn,		SHCMD("dmenurecord kill") },
+	{ 0, XF86XK_ScreenSaver,                   spawn,		SHCMD("slock & xset dpms force off; mpc pause; pauseallmpv") },
+	{ 0, XF86XK_MonBrightnessUp,               spawn,		SHCMD("xbacklight -inc 15") },
+	{ 0, XF86XK_MonBrightnessDown,             spawn,		SHCMD("xbacklight -dec 15") },
+	//{ 0, XF86XK_AudioMute,                     spawn,		SHCMD("pamixer -t; kill -44 $(pidof dwmblocks)") },
+	{ 0, XF86XK_AudioMute,                     spawn,		SHCMD("st") },
+	{ 0, XF86XK_AudioRaiseVolume,	             spawn,		SHCMD("pamixer --allow-boost -i 3; kill -44 $(pidof dwmblocks)") },
+	{ 0, XF86XK_AudioLowerVolume,	             spawn,		SHCMD("pamixer --allow-boost -d 3; kill -44 $(pidof dwmblocks)") },
+	{ 0, XF86XK_AudioPrev,                     spawn,		SHCMD("mpc prev") },
+	{ 0, XF86XK_AudioNext,                     spawn,		SHCMD("mpc next") },
+	{ 0, XF86XK_AudioPause,                    spawn,		SHCMD("mpc pause") },
+	{ 0, XF86XK_AudioPlay,                     spawn,		SHCMD("mpc play") },
+	{ 0, XF86XK_AudioStop,                     spawn,		SHCMD("mpc stop") },
+	{ 0, XF86XK_AudioRewind,                   spawn,		SHCMD("mpc seek -10") },
+	{ 0, XF86XK_AudioForward,                  spawn,		SHCMD("mpc seek +10") },
+	// { 0, XF86XK_AudioMedia,                    spawn,		SHCMD(TERMINAL " -e ncmpcpp") },
+	{ 0, XF86XK_AudioMicMute,                  spawn,		SHCMD("pactl set-source-mute @DEFAULT_SOURCE@ toggle") },
+	// { 0, XF86XK_PowerOff,                      spawn,		SHCMD("sysact") },
+	// { 0, XF86XK_Calculator,                    spawn,		SHCMD(TERMINAL " -e bc -l") },
+	// { 0, XF86XK_Sleep,                         spawn,		SHCMD("sudo -A zzz") },
+	// { 0, XF86XK_WWW,                           spawn,		SHCMD("$BROWSER") },
+	// { 0, XF86XK_DOS,                           spawn,		SHCMD(TERMINAL) },
+	// { 0, XF86XK_TaskPane,                      spawn,		SHCMD(TERMINAL " -e htop") },
+	// { 0, XF86XK_Mail,                          spawn,		SHCMD(TERMINAL " -e neomutt ; pkill -RTMIN+12 dwmblocks") },
+	// { 0, XF86XK_MyComputer,                    spawn,		SHCMD(TERMINAL " -e lfub /") },
+	// { 0, XF86XK_Launch1,                       spawn,		SHCMD("xset dpms force off") },
+	// { 0, XF86XK_TouchpadToggle,                spawn,		SHCMD("(synclient | grep 'TouchpadOff.*1' && synclient TouchpadOff=0) || synclient TouchpadOff=1") },
+	// { 0, XF86XK_TouchpadOff,                   spawn,		SHCMD("synclient TouchpadOff=1") },
+	// { 0, XF86XK_TouchpadOn,                    spawn,		SHCMD("synclient TouchpadOff=0") },
+	/* { 0, XF86XK_Battery,                    spawn,		SHCMD("") }, */
+	// Volume
+	// {0, XF86XK_AudioLowerVolume,            spawn,   SHCMD("pactl set-sink-volume @DEFAULT_SINK@ -5%")},
+	// {0, XF86XK_AudioRaiseVolume,            spawn,   SHCMD("pactl set-sink-volume @DEFAULT_SINK@ +5%")},
+	// {0, XF86XK_AudioMute,                   spawn,   SHCMD("pactl set-sink-mute @DEFAULT_SINK@ toggle")},
+
+	// Brightness
+	// {0, XF86XK_MonBrightnessUp,             spawn,   SHCMD("brightnessctl set +10%")},
+	// {0, XF86XK_MonBrightnessDown,           spawn,   SHCMD("brightnessctl set 10%-")},
+	// { MODKEY, XK_Scroll_Lock,                  spawn,		SHCMD("killall screenkey || screenkey &") },
 };
 
 /* button definitions */
